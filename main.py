@@ -2,10 +2,10 @@ import csv
 from typing import List, Optional
 
 from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Student API")
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,

@@ -65,8 +65,8 @@ def get_students(
         filtered = STUDENTS
 
     return {"students": [
-            student.model_dump(by_alias=True)
-            for student in filtered
+        student.dict(by_alias=True)
+        for student in filtered
     ]}
 
 

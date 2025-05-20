@@ -45,9 +45,17 @@ app.add_middleware(
 # In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
+class StudentsResponse(BaseModel):
+    students: list[Student]
 
+    class Config:
+        allow_population_by_field_name = True
 
-@app.get("/api", response_model=dict)
+@app.get(
+    "/api",
+    response_model=StudentsResponse,
+    response_model_by_alias=True
+)
 def get_students(
     class_: Optional[List[str]] = Query(
         None,

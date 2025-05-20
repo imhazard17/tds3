@@ -5,20 +5,16 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],            # ← wildcard: all origins allowed
-    allow_methods=["GET"],          # ← only GET; use ["*"] to allow all methods
-    allow_headers=["*"],            # ← all request headers permitted
-    allow_credentials=False,        # ← set True only if you need cookies/auth
-)
 
 # Pydantic model for a student record
 class Student(BaseModel):
     studentId: int
     class_: str
+
+    class Config:
+        fields = {
+            'class_': 'class'
+        }
 
 
 # Load CSV into memory at startup
@@ -33,6 +29,17 @@ def load_students(csv_path: str) -> List[Student]:
             students.append(Student(studentId=sid, class_=cls))
     return students
 
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],            # ← wildcard: all origins allowed
+    allow_methods=["GET"],          # ← only GET; use ["*"] to allow all methods
+    allow_headers=["*"],            # ← all request headers permitted
+    allow_credentials=False,        # ← set True only if you need cookies/auth
+)
+
 # In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
@@ -43,16 +50,21 @@ def func(student: Student):
 
 @app.get("/api", response_model=dict)
 def get_students(
-    class_: List[str] = Query(
-        default=[],
+    class_: Optional[List[str]] = Query(
+        None,
         alias="class",
+        description="Filter by one or more class names, e.g. ?class=1A&class=1B"
     )
-):    
+):
+    """
+    Return all students, optionally filtering by class.
+    The order of students is the same as in the CSV file.
+    """
     if class_:
         filtered = [s for s in STUDENTS if s.class_ in class_]
     else:
         filtered = STUDENTS
-    
+
     return {"students": map(func, filtered)}
 
 

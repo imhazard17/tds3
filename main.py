@@ -5,18 +5,17 @@ from typing import List, Optional
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # Pydantic model for a student record
 class Student(BaseModel):
     studentId: int
-    class_: str
+    class_: str = Field(alias="class")
 
     class Config:
-        fields = {
-            'class_': 'class'
-        }
+        populate_by_name = True
+        json_schema_extra = {"students": [{"class": "example_class", "studentId": "example_studentId"}]}
 
 
 # Load CSV into memory at startup
@@ -45,16 +44,9 @@ app.add_middleware(
 # In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
-class StudentsResponse(BaseModel):
-    students: list[Student]
-
-    class Config:
-        allow_population_by_field_name = True
-
 @app.get(
     "/api",
-    response_model=StudentsResponse,
-    response_model_by_alias=True
+    response_model=dict,
 )
 def get_students(
     class_: Optional[List[str]] = Query(
@@ -73,7 +65,7 @@ def get_students(
         filtered = STUDENTS
 
     return {"students": [
-        student.dict(by_alias=True)
+        student.model_dump(by_alias=True)
         for student in filtered
     ]}
 

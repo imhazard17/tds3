@@ -5,6 +5,18 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+app = FastAPI(title="Student API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],            # ← wildcard: all origins allowed
+    allow_methods=["GET"],          # ← only GET; use ["*"] to allow all methods
+    allow_headers=["*"],            # ← all request headers permitted
+    allow_credentials=False,        # ← set True only if you need cookies/auth
+)
+
+# In-memory store of all students
+STUDENTS = load_students("q-fastapi.csv")
 
 # Pydantic model for a student record
 class Student(BaseModel):
@@ -28,20 +40,6 @@ def load_students(csv_path: str) -> List[Student]:
             cls = row['class']
             students.append(Student(studentId=sid, class_=cls))
     return students
-
-
-app = FastAPI(title="Student API")
-
-# Enable CORS for any origin
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# In-memory store of all students
-STUDENTS = load_students("q-fastapi.csv")
 
 def func(student: Student):
     s = student.__dict__

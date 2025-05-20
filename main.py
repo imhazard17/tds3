@@ -1,3 +1,5 @@
+# main.py
+
 import csv
 from typing import List, Optional
 
@@ -30,23 +32,20 @@ def load_students(csv_path: str) -> List[Student]:
     return students
 
 
-app = FastAPI()
+app = FastAPI(title="Student API")
 
+# Enable CORS for any origin
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],            # ← wildcard: all origins allowed
-    allow_methods=["GET"],          # ← only GET; use ["*"] to allow all methods
-    allow_headers=["*"],            # ← all request headers permitted
-    allow_credentials=False,        # ← set True only if you need cookies/auth
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
-def func(student: Student):
-    s = student.__dict__
-    s["class"] = s.pop("class_")
-    return s
+
 
 @app.get("/api", response_model=dict)
 def get_students(
@@ -65,7 +64,8 @@ def get_students(
     else:
         filtered = STUDENTS
 
-    return {"students": map(func, filtered)}
+    # FastAPI will convert Pydantic models to dicts
+    return {"students": filtered}
 
 
 if __name__ == "__main__":

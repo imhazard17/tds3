@@ -1,5 +1,3 @@
-# main.py
-
 import csv
 from typing import List, Optional
 
@@ -62,6 +60,8 @@ def get_students(
     for f in filtered:
         value = f.pop("class_")
         f.append({"class": value})
+        
+    print(filtered)
 
     return {"students": filtered}
 

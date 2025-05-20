@@ -64,8 +64,10 @@ def get_students(
     else:
         filtered = STUDENTS
 
-    # FastAPI will convert Pydantic models to dicts
-    return {"students": filtered}
+    return {"students": [
+            student.model_dump(by_alias=True)
+            for student in filtered
+    ]}
 
 
 if __name__ == "__main__":

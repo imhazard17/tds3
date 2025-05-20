@@ -43,6 +43,10 @@ app.add_middleware(
 # In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
+def func(student: Student):
+    s = student.__dict__
+    s["class"] = s.pop("class_")
+    return s
 
 @app.get("/api", response_model=dict)
 def get_students(
@@ -57,9 +61,7 @@ def get_students(
     else:
         filtered = STUDENTS
     
-    for f in filtered:
-        f = f.__dict__
-        f['class'] = f.pop("class_")
+    filtered = map(func, filtered)
 
     print(filtered)
 

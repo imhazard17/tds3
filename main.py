@@ -52,6 +52,7 @@ def get_students(
         description="Filter by one or more class names, e.g. ?class=1A&class=1B"
     )
 ):    
+    print('|||||||||||||||||')
     if class_:
         filtered = [s for s in STUDENTS if s.class_ in class_]
     else:

@@ -1,9 +1,9 @@
 import csv
-from typing import List, Optional
+from typing import List
 
 from fastapi import FastAPI, Query
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -15,7 +15,6 @@ app.add_middleware(
     allow_credentials=False,        # ← set True only if you need cookies/auth
 )
 
-# Pydantic model for a student record
 class Student(BaseModel):
     studentId: int
     class_: str
@@ -26,7 +25,6 @@ class Student(BaseModel):
         }
 
 
-# Load CSV into memory at startup
 def load_students(csv_path: str) -> List[Student]:
     students: List[Student] = []
     with open(csv_path, newline='', encoding='utf-8') as f:
@@ -38,7 +36,6 @@ def load_students(csv_path: str) -> List[Student]:
             students.append(Student(studentId=sid, class_=cls))
     return students
 
-# In-memory store of all students
 STUDENTS = load_students("q-fastapi.csv")
 
 def func(student: Student):
@@ -47,21 +44,13 @@ def func(student: Student):
     return s
 
 @app.get("/api", response_model=dict)
-def get_students(
-    class_: Optional[List[str]] = Query(
-        None,
-        alias="class",
-        description="Filter by one or more class names, e.g. ?class=1A&class=1B"
-    )
-):    
+def get_students(class_: List[str] = Query(default=[])):    
     if class_:
         filtered = [s for s in STUDENTS if s.class_ in class_]
     else:
         filtered = STUDENTS
     
     filtered = map(func, filtered)
-
-    print(filtered)
 
     return {"students": filtered}
 

@@ -53,17 +53,16 @@ def get_students(
         alias="class",
         description="Filter by one or more class names, e.g. ?class=1A&class=1B"
     )
-):
-    """
-    Return all students, optionally filtering by class.
-    The order of students is the same as in the CSV file.
-    """
+):    
     if class_:
         filtered = [s for s in STUDENTS if s.class_ in class_]
     else:
         filtered = STUDENTS
+    
+    for f in filtered:
+        value = f.pop("class_")
+        f.append({"class": value})
 
-    # FastAPI will convert Pydantic models to dicts
     return {"students": filtered}
 
 

@@ -65,7 +65,7 @@ def get_students(
         filtered = STUDENTS
 
     return {"students": [
-        student.dict(by_alias=True)
+        student.__dict__(by_alias=True)
         for student in filtered
     ]}
 

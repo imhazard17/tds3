@@ -20,11 +20,6 @@ class Student(BaseModel):
     studentId: int
     class_: str
 
-    class Config:
-        fields = {
-            'class_': 'class'
-        }
-
 
 # Load CSV into memory at startup
 def load_students(csv_path: str) -> List[Student]:
@@ -58,9 +53,7 @@ def get_students(
     else:
         filtered = STUDENTS
     
-    filtered = map(func, filtered)
-
-    return {"students": filtered}
+    return {"students": map(func, filtered)}
 
 
 if __name__ == "__main__":

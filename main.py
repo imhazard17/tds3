@@ -15,9 +15,6 @@ app.add_middleware(
     allow_credentials=False,        # ← set True only if you need cookies/auth
 )
 
-# In-memory store of all students
-STUDENTS = load_students("q-fastapi.csv")
-
 # Pydantic model for a student record
 class Student(BaseModel):
     studentId: int
@@ -40,6 +37,9 @@ def load_students(csv_path: str) -> List[Student]:
             cls = row['class']
             students.append(Student(studentId=sid, class_=cls))
     return students
+
+# In-memory store of all students
+STUDENTS = load_students("q-fastapi.csv")
 
 def func(student: Student):
     s = student.__dict__

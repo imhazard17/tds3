@@ -52,17 +52,15 @@ def get_students(
         description="Filter by one or more class names, e.g. ?class=1A&class=1B"
     )
 ):    
-    print('|||||||||||||||||')
     if class_:
         filtered = [s for s in STUDENTS if s.class_ in class_]
     else:
         filtered = STUDENTS
     
-    print(filtered)
     for f in filtered:
-        value = f.pop("class_")
-        f.append({"class": value})
-        
+        f = f.__dict__
+        f['class'] = f.pop("class_")
+
     print(filtered)
 
     return {"students": filtered}

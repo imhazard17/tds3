@@ -58,6 +58,7 @@ def get_students(
     else:
         filtered = STUDENTS
     
+    print(filtered)
     for f in filtered:
         value = f.pop("class_")
         f.append({"class": value})
